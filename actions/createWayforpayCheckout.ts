@@ -1,0 +1,128 @@
+'use server';
+
+import { Wayforpay, TCartElement } from 'wayforpay-ts-integration';
+import baseUrl from '@/lib/baseUrl';
+import getCourseById from '@/sanity/lib/courses/getCourseById';
+import { createStudentIfNotExists } from '@/sanity/lib/student/createStudentIfNotExists';
+import { clerkClient } from '@clerk/nextjs/server';
+import { createEnrollment } from '@/sanity/lib/student/createEnrollment';
+
+interface WayforpayCheckoutResult {
+  type: 'form' | 'redirect';
+  data: string | null; // HTML form string for Wayforpay, or redirect path for free course
+  error?: string;
+}
+
+export async function createWayforpayCheckout(
+  courseId: string,
+  userId: string
+): Promise<WayforpayCheckoutResult> {
+  try {
+    const course = await getCourseById(courseId);
+    const clerkUser = await (await clerkClient()).users.getUser(userId);
+    const { emailAddresses, firstName, lastName, imageUrl } = clerkUser;
+    const email = emailAddresses[0]?.emailAddress;
+
+    if (!emailAddresses || !email) {
+      return { type: 'redirect', data: null, error: 'User details not found' };
+    }
+    if (!course) {
+      return { type: 'redirect', data: null, error: 'Course not found' };
+    }
+
+    const sanityUser = await createStudentIfNotExists({
+      clerkId: userId,
+      email: email || '',
+      firstName: firstName || email,
+      lastName: lastName || '',
+      imageUrl: imageUrl || '',
+    });
+
+    if (!sanityUser) {
+      return {
+        type: 'redirect',
+        data: null,
+        error: 'Sanity user not found or could not be created',
+      };
+    }
+
+    if (course.price === undefined || course.price === null) {
+      return { type: 'redirect', data: null, error: 'Course price is not set' };
+    }
+
+    const { title, description, image, slug } = course;
+    if (!title || !description || !image || !slug?.current) {
+      return {
+        type: 'redirect',
+        data: null,
+        error: 'Course data is incomplete',
+      };
+    }
+
+    // Free course logic
+    if (course.price === 0) {
+      await createEnrollment({
+        studentId: sanityUser._id,
+        courseId: course._id,
+        paymentId: `free_wayforpay_${Date.now()}`, // Unique payment ID for free enrollment via Wayforpay path
+        paymentProvider: 'wayforpay',
+        amount: 0,
+      });
+      // For free courses, redirect directly to the course page within the dashboard
+      return { type: 'redirect', data: `/dashboard/courses/${course._id}` };
+    }
+
+    // Paid course logic for WayForPay
+    if (
+      !process.env.WAYFORPAY_MERCHANT_LOGIN ||
+      !process.env.WAYFORPAY_MERCHANT_SECRET_KEY ||
+      !process.env.WAYFORPAY_DOMAIN ||
+      !process.env.WAYFORPAY_CURRENCY
+    ) {
+      return {
+        type: 'redirect',
+        data: null,
+        error: 'WayForPay environment variables are not properly configured.',
+      };
+    }
+
+    const wayforpayClient = new Wayforpay({
+      merchantLogin: process.env.WAYFORPAY_MERCHANT_LOGIN,
+      merchantSecret: process.env.WAYFORPAY_MERCHANT_SECRET_KEY,
+    });
+
+    // Unique orderReference: courseId_clerkUserId_timestamp
+    // This helps link the transaction back to the course and user in the webhook.
+    const orderReference = `${course._id}_${userId}_${Date.now()}`;
+
+    const cartElements: TCartElement[] = [
+      {
+        product: {
+          name: title,
+          price: course.price, // Assuming course.price is in the currency set by WAYFORPAY_CURRENCY
+        },
+        quantity: 1,
+      },
+    ];
+
+    const wayforpayFormHtml = await wayforpayClient.purchase(cartElements, {
+      domain: process.env.WAYFORPAY_DOMAIN,
+      orderReference: orderReference,
+      currency: process.env.WAYFORPAY_CURRENCY as 'USD' | 'EUR',
+      returnUrl: `${baseUrl}/courses/${slug.current}?payment_success=wayforpay`, // Indicate success and provider
+      serviceUrl: `${baseUrl}/api/wayforpay/webhook`, // Your WayForPay webhook endpoint
+      clientFirstName: firstName || undefined,
+      clientLastName: lastName || undefined,
+      clientEmail: email || undefined,
+    });
+
+    return { type: 'form', data: wayforpayFormHtml };
+  } catch (error) {
+    console.error('Error in createWayforpayCheckout:', error);
+    return {
+      type: 'redirect',
+      data: null,
+      error: `Failed to create WayForPay checkout: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    };
+  }
+}
