@@ -1,15 +1,16 @@
 {
   "compact": true,
-  "controlFlowFlattening": true,
-  "controlFlowFlatteningThreshold": 0.75,
-  "deadCodeInjection": true,
-  "deadCodeInjectionThreshold": 0.4,
-  "selfDefending": true,
+  "controlFlowFlattening": false,
+  "deadCodeInjection": false,
+  "selfDefending": false,
   "stringArray": true,
   "stringArrayEncoding": ["base64"],
-  "stringArrayThreshold": 0.75,
+  "stringArrayThreshold": 0.5,
   "unicodeEscapeSequence": false,
-  "reservedStrings": ["^use client$", "^use server$"],
-  "ignoreRequireImports": false,
-  "ignoreImports": false
+  "reservedStrings": ["^use client$", "^use server$", "^export$", "^import$"],
+  "ignoreRequireImports": true,
+  "ignoreImports": true,
+  "disableConsoleOutput": false,
+  "renameGlobals": false,
+  "transformObjectKeys": false
 }
