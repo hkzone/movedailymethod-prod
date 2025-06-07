@@ -8,5 +8,8 @@
   "stringArray": true,
   "stringArrayEncoding": ["base64"],
   "stringArrayThreshold": 0.75,
-  "unicodeEscapeSequence": false
+  "unicodeEscapeSequence": false,
+  "reservedStrings": ["^use client$", "^use server$"],
+  "ignoreRequireImports": false,
+  "ignoreImports": false
 }
