@@ -1,1 +1,26 @@
-(function(_0x92d057,_0x1c2ebf){const _0x195733=a0_0x36fe,_0xde87dc=_0x92d057();while(!![]){try{const _0x20149d=parseInt(_0x195733(0xc1))/0x1*(-parseInt(_0x195733(0xbd))/0x2)+parseInt(_0x195733(0xbf))/0x3+-parseInt(_0x195733(0xc4))/0x4+-parseInt(_0x195733(0xc0))/0x5+parseInt(_0x195733(0xb9))/0x6+-parseInt(_0x195733(0xc2))/0x7*(parseInt(_0x195733(0xbc))/0x8)+-parseInt(_0x195733(0xc3))/0x9*(-parseInt(_0x195733(0xbe))/0xa);if(_0x20149d===_0x1c2ebf)break;else _0xde87dc['push'](_0xde87dc['shift']());}catch(_0x1b9550){_0xde87dc['push'](_0xde87dc['shift']());}}}(a0_0x121e,0x2e50b));import{jsx as a0_0x3c0d8d,jsxs as a0_0x2a6791}from'react/jsx-runtime';import{redirect}from'next/navigation';function a0_0x36fe(_0x13ea98,_0x6daaa6){const _0x121e29=a0_0x121e();return a0_0x36fe=function(_0x36fe27,_0x8cec64){_0x36fe27=_0x36fe27-0xb9;let _0x5df999=_0x121e29[_0x36fe27];return _0x5df999;},a0_0x36fe(_0x13ea98,_0x6daaa6);}import{currentUser}from'@clerk/nextjs/server';function a0_0x121e(){const _0x332f32=['1559060IloRgZ','19576TLOBPu','31591GIyNtJ','4162365aFQEwR','1060880sluhfA','1116876pVajuw','isAuthorized','div','184FspRXM','4qmAteZ','10AbKwyb','783177NkwinK'];a0_0x121e=function(){return _0x332f32;};return a0_0x121e();}import a0_0xb2255d from'@/sanity/lib/courses/getCourseById';import{Sidebar}from'@/components/dashboard/Sidebar';import{getCourseProgress}from'@/sanity/lib/lessons/getCourseProgress';import{checkCourseAccess}from'@/lib/auth';export default async function CourseLayout({children:_0x40bc67,params:_0x551bc6}){const _0x195d96=a0_0x36fe,_0x41c86d=await currentUser(),{courseId:_0x519937}=await _0x551bc6;if(!_0x41c86d?.['id'])return redirect('/');const _0x2187aa=await checkCourseAccess(_0x41c86d?.['id']||null,_0x519937);if(!_0x2187aa[_0x195d96(0xba)]||!_0x41c86d?.['id'])return redirect(_0x2187aa['redirect']);const [_0x536e28,_0x1b6408]=await Promise['all']([a0_0xb2255d(_0x519937),getCourseProgress(_0x41c86d['id'],_0x519937)]);if(!_0x536e28)return redirect('/my-courses');return a0_0x2a6791(_0x195d96(0xbb),{'className':'h-full','children':[a0_0x3c0d8d(Sidebar,{'course':_0x536e28,'completedLessons':_0x1b6408['completedLessons']}),a0_0x3c0d8d('main',{'className':'h-full lg:pt-[64px] pl-20 lg:pl-96','children':_0x40bc67})]});}
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { redirect } from "next/navigation";
+import { currentUser } from "@clerk/nextjs/server";
+import getCourseById from "@/sanity/lib/courses/getCourseById";
+import { Sidebar } from "@/components/dashboard/Sidebar";
+import { getCourseProgress } from "@/sanity/lib/lessons/getCourseProgress";
+import { checkCourseAccess } from "@/lib/auth";
+export default async function CourseLayout({ children, params, }) {
+    const user = await currentUser();
+    const { courseId } = await params;
+    if (!user?.id) {
+        return redirect("/");
+    }
+    const authResult = await checkCourseAccess(user?.id || null, courseId);
+    if (!authResult.isAuthorized || !user?.id) {
+        return redirect(authResult.redirect);
+    }
+    const [course, progress] = await Promise.all([
+        getCourseById(courseId),
+        getCourseProgress(user.id, courseId),
+    ]);
+    if (!course) {
+        return redirect("/my-courses");
+    }
+    return (_jsxs("div", { className: "h-full", children: [_jsx(Sidebar, { course: course, completedLessons: progress.completedLessons }), _jsx("main", { className: "h-full lg:pt-[64px] pl-20 lg:pl-96", children: children })] }));
+}
