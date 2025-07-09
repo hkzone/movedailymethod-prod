@@ -20,10 +20,23 @@ export const statsType = defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'titleMobile',
+            title: 'Title Mobile',
+            type: 'string',
+            description: 'Main heading text',
+            validation: (Rule) => Rule.required(),
+        }),
+        defineField({
             name: 'description',
             title: 'Description',
             type: 'text',
             description: 'Paragraph text below the title',
+        }),
+        defineField({
+            name: 'descriptionMobile',
+            title: 'Description Mobile',
+            type: 'text',
+            description: 'Paragraph text below the title for mobile',
         }),
         defineField({
             name: 'stats',

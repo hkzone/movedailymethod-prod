@@ -30,8 +30,19 @@ export const featuresType = defineType({
                     validation: (Rule) => Rule.required(),
                 }),
                 defineField({
+                    name: 'titleMobile',
+                    title: 'Title Mobile',
+                    type: 'string',
+                    validation: (Rule) => Rule.required(),
+                }),
+                defineField({
                     name: 'description',
                     title: 'Description',
+                    type: 'text',
+                }),
+                defineField({
+                    name: 'descriptionMobile',
+                    title: 'Description Mobile',
                     type: 'text',
                 }),
             ],

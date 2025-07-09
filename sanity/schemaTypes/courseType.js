@@ -38,6 +38,11 @@ export const courseType = defineType({
             type: 'image',
         }),
         defineField({
+            name: 'imageMobile',
+            title: 'Course Image Mobile',
+            type: 'image',
+        }),
+        defineField({
             name: 'category',
             title: 'Category',
             type: 'reference',
@@ -55,6 +60,36 @@ export const courseType = defineType({
             title: 'Instructor',
             type: 'reference',
             to: { type: 'instructor' },
+        }),
+        defineField({
+            name: 'courseType',
+            title: 'Course Type',
+            type: 'string',
+            options: {
+                list: [
+                    { title: 'Self-Guided', value: 'self-guided' },
+                    { title: 'Follow-Along', value: 'follow-along' },
+                    { title: 'Structured Program', value: 'structured' },
+                    { title: 'Challenge Mode', value: 'challenge' },
+                ],
+                layout: 'dropdown',
+            },
+            initialValue: 'self-guided',
+        }),
+        defineField({
+            name: 'rating',
+            title: 'Rating',
+            type: 'number',
+            validation: (Rule) => Rule.min(0).max(5),
+            initialValue: 5,
+        }),
+        //quality of participants
+        defineField({
+            name: 'quantityOfParticipants',
+            title: 'Quantity of Participants',
+            type: 'number',
+            validation: (Rule) => Rule.min(0),
+            initialValue: 100,
         }),
         defineField({
             // New field for course-level materials

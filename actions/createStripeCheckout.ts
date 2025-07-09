@@ -92,8 +92,8 @@ export async function createStripeCheckout(
         },
       ],
       mode: 'payment',
-      success_url: `${baseUrl}/courses/${slug.current}?payment_success=stripe`, // Indicate success and provider
-      cancel_url: `${baseUrl}/courses/${slug.current}?payment_canceled=true`,
+      success_url: `${baseUrl}/payment/success?payment_success=stripe&type=course`, // Indicate success and provider
+      cancel_url: `${baseUrl}/payment/failed?provider=stripe&type=course&reason=Payment cancelled by user`,
       metadata: {
         courseId: course._id,
         userId: userId, // Clerk User ID

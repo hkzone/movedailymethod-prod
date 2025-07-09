@@ -18,8 +18,12 @@ export async function createWayforpayCheckout(
   userId: string
 ): Promise<WayforpayCheckoutResult> {
   try {
-    const course = await getCourseById(courseId);
-    const clerkUser = await (await clerkClient()).users.getUser(userId);
+    // Parallelize course and user data fetching
+    const [course, clerkUser] = await Promise.all([
+      getCourseById(courseId),
+      (await clerkClient()).users.getUser(userId),
+    ]);
+
     const { emailAddresses, firstName, lastName, imageUrl } = clerkUser;
     const email = emailAddresses[0]?.emailAddress;
 
@@ -73,11 +77,19 @@ export async function createWayforpayCheckout(
     }
 
     // Paid course logic for WayForPay
+    // Pre-validate environment variables
+    const requiredEnvVars = {
+      merchantLogin: process.env.WAYFORPAY_MERCHANT_LOGIN,
+      merchantSecret: process.env.WAYFORPAY_MERCHANT_SECRET_KEY,
+      domain: process.env.WAYFORPAY_DOMAIN,
+      currency: process.env.WAYFORPAY_CURRENCY,
+    };
+
     if (
-      !process.env.WAYFORPAY_MERCHANT_LOGIN ||
-      !process.env.WAYFORPAY_MERCHANT_SECRET_KEY ||
-      !process.env.WAYFORPAY_DOMAIN ||
-      !process.env.WAYFORPAY_CURRENCY
+      !requiredEnvVars.merchantLogin ||
+      !requiredEnvVars.merchantSecret ||
+      !requiredEnvVars.domain ||
+      !requiredEnvVars.currency
     ) {
       return {
         type: 'redirect',
@@ -86,31 +98,30 @@ export async function createWayforpayCheckout(
       };
     }
 
-    const wayforpayClient = new Wayforpay({
-      merchantLogin: process.env.WAYFORPAY_MERCHANT_LOGIN,
-      merchantSecret: process.env.WAYFORPAY_MERCHANT_SECRET_KEY,
-    });
-
-    // Unique orderReference: courseId_clerkUserId_timestamp
-    // This helps link the transaction back to the course and user in the webhook.
-    const orderReference = `${course._id}_${userId}_${Date.now()}`;
-
+    // Pre-build order data
+    const orderReference = `${course._id}--${userId}--${Date.now()}`;
     const cartElements: TCartElement[] = [
       {
         product: {
           name: title,
-          price: course.price, // Assuming course.price is in the currency set by WAYFORPAY_CURRENCY
+          price: course.price,
         },
         quantity: 1,
       },
     ];
 
+    // Initialize client and generate form
+    const wayforpayClient = new Wayforpay({
+      merchantLogin: requiredEnvVars.merchantLogin,
+      merchantSecret: requiredEnvVars.merchantSecret,
+    });
+
     const wayforpayFormHtml = await wayforpayClient.purchase(cartElements, {
-      domain: process.env.WAYFORPAY_DOMAIN,
-      orderReference: orderReference,
-      currency: process.env.WAYFORPAY_CURRENCY as 'USD' | 'EUR',
-      returnUrl: `${baseUrl}/courses/${slug.current}?payment_success=wayforpay`, // Indicate success and provider
-      serviceUrl: `${baseUrl}/api/wayforpay/webhook`, // Your WayForPay webhook endpoint
+      domain: requiredEnvVars.domain,
+      orderReference,
+      currency: requiredEnvVars.currency as 'USD' | 'EUR',
+      returnUrl: `${baseUrl}/payment/redirect?provider=wayforpay&type=course&order=${orderReference}`,
+      serviceUrl: `${baseUrl}/api/wayforpay/webhook`,
       clientFirstName: firstName || undefined,
       clientLastName: lastName || undefined,
       clientEmail: email || undefined,

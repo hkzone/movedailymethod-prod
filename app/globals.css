@@ -31,6 +31,12 @@ body {
     --accent-foreground: 0 0% 9%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
+    --success: 146 79% 44%;
+    --success-foreground: 0 0% 98%;
+    --warning: 43 96% 56%;
+    --warning-foreground: 0 0% 98%;
+    --info: 218 91% 60%;
+    --info-foreground: 0 0% 98%;
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
     --ring: 0 0% 3.9%;
@@ -61,6 +67,12 @@ body {
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
+    --success: 158 64% 52%;
+    --success-foreground: 0 0% 98%;
+    --warning: 43 96% 56%;
+    --warning-foreground: 0 0% 98%;
+    --info: 218 91% 60%;
+    --info-foreground: 0 0% 98%;
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;

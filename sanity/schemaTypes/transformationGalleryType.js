@@ -27,10 +27,23 @@ export const transformationGalleryType = defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'titleMobile',
+            title: 'Title Mobile',
+            type: 'string',
+            description: 'Main heading text for mobile',
+            validation: (Rule) => Rule.required(),
+        }),
+        defineField({
             name: 'subtitle',
             title: 'Subtitle',
             type: 'string',
             description: 'Text bellow the title',
+        }),
+        defineField({
+            name: 'subtitleMobile',
+            title: 'Subtitle Mobile',
+            type: 'string',
+            description: 'Text bellow the title for mobile',
         }),
         defineField({
             name: 'ctaButton',
@@ -82,7 +95,7 @@ export const transformationGalleryType = defineType({
                             title: 'Weight Loss',
                             type: 'number',
                             description: 'Enter the weight loss number (unit will be added automatically)',
-                            validation: (Rule) => Rule.required().min(0),
+                            validation: (Rule) => Rule.min(0),
                         }),
                         defineField({
                             name: 'weightUnit',
@@ -96,7 +109,14 @@ export const transformationGalleryType = defineType({
                                 ],
                             },
                             initialValue: 'lbs',
-                            validation: (Rule) => Rule.required(),
+                            //only required if weightLoss is not 0
+                            validation: (Rule) => Rule.custom((value, context) => {
+                                const { parent } = context;
+                                if (parent?.weightLoss !== 0 && !value) {
+                                    return 'Weight unit is required when weight loss is specified';
+                                }
+                                return true;
+                            }),
                         }),
                         defineField({
                             name: 'testimonial',

@@ -23,6 +23,13 @@ export const structure = (S) => S.list()
             .params({ courseId })),
     ]))),
     S.divider(),
+    // Course Bundles Content
+    S.listItem()
+        .title('Course Bundles Content')
+        .child(S.list()
+        .title('Course Bundles Content')
+        .items([S.documentTypeListItem('courseBundle').title('Bundles')])),
+    S.divider(),
     // Website Content
     S.listItem()
         .title('Website Content')
@@ -40,6 +47,17 @@ export const structure = (S) => S.list()
         S.documentTypeListItem('faq').title('FAQ Section'),
         S.documentTypeListItem('footer').title('Footer Section'),
         S.documentTypeListItem('header').title('Header Section'),
+    ])),
+    // Legal Content
+    S.listItem()
+        .title('Legal Content')
+        .child(S.list()
+        .title('Legal Content')
+        .items([
+        S.documentTypeListItem('termsConditions').title('Terms and Conditions'),
+        S.documentTypeListItem('refundPolicy').title('Refund Policy'),
+        S.documentTypeListItem('privacyPolicy').title('Privacy Policy'),
+        S.documentTypeListItem('contactInfo').title('Contact Info'),
     ])),
     S.divider(),
     // Users

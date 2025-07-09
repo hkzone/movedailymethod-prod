@@ -18,6 +18,12 @@ import { faqType } from './faqType';
 import { footerType } from './footerType';
 import { headerType } from './headerType';
 import { coursesSectionType } from './coursesSectionType';
+import { courseBundleType } from './courseBundleType';
+import { termsConditionsType } from './termsConditionsType';
+import { refundPolicyType } from './refundPolicyType';
+import { contactInfoType } from './contactInfoType';
+import { privacyPolicyType } from './privacyPolicyType';
+import { bundleEnrollmentType } from './bundleEnrollmentType';
 export const schema = {
     types: [
         courseType,
@@ -40,6 +46,12 @@ export const schema = {
         footerType,
         headerType,
         coursesSectionType,
+        courseBundleType,
+        termsConditionsType,
+        refundPolicyType,
+        contactInfoType,
+        privacyPolicyType,
+        bundleEnrollmentType,
     ],
 };
 export * from './courseType';
@@ -61,3 +73,9 @@ export * from './faqType';
 export * from './footerType';
 export * from './headerType';
 export * from './coursesSectionType';
+export * from './courseBundleType';
+export * from './termsConditionsType';
+export * from './refundPolicyType';
+export * from './contactInfoType';
+export * from './privacyPolicyType';
+export * from './bundleEnrollmentType';

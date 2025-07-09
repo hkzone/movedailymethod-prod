@@ -19,8 +19,20 @@ export const heroType = defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
+            name: 'titleMobile',
+            title: 'Title Mobile',
+            type: 'text',
+            validation: (Rule) => Rule.required(),
+        }),
+        defineField({
             name: 'subtitle',
             title: 'Subtitle',
+            type: 'text',
+            validation: (Rule) => Rule.required(),
+        }),
+        defineField({
+            name: 'subtitleMobile',
+            title: 'Subtitle Mobile',
             type: 'text',
             validation: (Rule) => Rule.required(),
         }),
