@@ -28,6 +28,7 @@
     "@sanity/preview-url-secret": "^2.1.11",
     "@sanity/vision": "^3.89.0",
     "@tailwindcss/typography": "^0.5.16",
+    "canvas-confetti": "^1.9.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "groq": "^3.72.1",
@@ -50,6 +51,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.17.16",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
